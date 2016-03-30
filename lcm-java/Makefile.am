@@ -1,9 +1,11 @@
 JAVAROOT = $(builddir)/build
 JARFILE = lcm.jar
-jchart2d_src_dir = $(abs_srcdir)/jchart2d-code/src
-jchart2d_ext_dir = $(abs_srcdir)/jchart2d-code/ext
+jchart2d_src_dir = $(srcdir)/jchart2d-code/src
+jchart2d_ext_dir = $(srcdir)/jchart2d-code/ext
 jide_jar = $(jchart2d_ext_dir)/jide-oss-2.9.7.jar
+jide_abs_jar = $(abs_srcdir)/jchart2d-code/ext/jide-oss-2.9.7.jar
 xmlgraphics_jar = $(jchart2d_ext_dir)/xmlgraphics-commons-1.3.1.jar
+xmlgraphics_abs_jar = $(abs_srcdir)/jchart2d-code/ext/xmlgraphics-commons-1.3.1.jar
 JAVACFLAGS = -source 1.5 -target 1.5 -classpath $(jide_jar):$(xmlgraphics_jar):$(jchart2d_src_dir)
 
 jide_extract = $(JAVAROOT)/com/jidesoft/comparator/AlphanumComparator.class
@@ -20,14 +22,14 @@ $(JARFILE): $(jchart2d_jar) $(jide_extract) $(xmlgraphics_extract) classfiles
 jar_DATA = $(JARFILE) $(jchart2d_jar)
 
 $(jide_extract): $(jide_jar)
-	cd $(JAVAROOT) && $(JAR) xf $(jide_jar)
+	cd $(JAVAROOT) && $(JAR) xf $(jide_abs_jar)
 
 # NOTE: This rule depends on $(jide_extract) because there seemed to be a race condition in
 # extracting the jars, specifically during a parallel build both jar xf jobs will attempt
 # to create the same directories if they do not exist causing one of the mkdir attempts
 # to fail.
 $(xmlgraphics_extract): $(xmlgraphics_jar) $(jide_extract)
-	cd $(JAVAROOT) && $(JAR) xf $(xmlgraphics_jar)
+	cd $(JAVAROOT) && $(JAR) xf $(xmlgraphics_abs_jar)
 
 jchart2d_cleanfiles = $(JAVAROOT)/com/jidesoft/plaf/xerto/icons/rollover_c.gif \
     $(JAVAROOT)/com/jidesoft/plaf/xerto/icons/rollover.gif \
